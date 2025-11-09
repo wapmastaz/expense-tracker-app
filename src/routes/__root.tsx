@@ -1,14 +1,15 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-
-import Header from '../components/Header'
+import {Toaster} from "sonner";
+import MobileBottomNavBar from "@/components/layouts/MobileBottomNavBar.tsx";
 
 export const Route = createRootRoute({
   component: () => (
     <>
-      <Header />
       <Outlet />
+      <Toaster />
+      <MobileBottomNavBar/>
       <TanStackDevtools
         config={{
           position: 'bottom-right',

@@ -8,6 +8,9 @@ import { routeTree } from './routeTree.gen'
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 
+// @ts-ignore
+import '@fontsource-variable/inter';
+
 // Create a new router instance
 const router = createRouter({
   routeTree,
