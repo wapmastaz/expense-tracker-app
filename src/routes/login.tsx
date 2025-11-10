@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import {createFileRoute, Link} from '@tanstack/react-router'
+import {createFileRoute, Link, useNavigate} from '@tanstack/react-router'
 import {ChevronLeft} from "lucide-react";
 
 import {
@@ -12,6 +12,9 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import z from "zod/v3";
 import { Input } from "@/components/ui/input";
 import {toast} from "sonner";
+import {loginUser} from "@/services/auth-service.ts";
+import {useState} from "react";
+import {Spinner} from "@/components/ui/spinner.tsx";
 
 export const Route =
   createFileRoute('/login')({
@@ -28,6 +31,10 @@ const loginFormSchema = z.object({
 
 function LoginPage() {
 
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
   const form =
     useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -37,21 +44,22 @@ function LoginPage() {
     },
   })
 
-  function onSubmit(data: z.infer<typeof loginFormSchema>) {
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: "bottom-right",
-      classNames: {
-        content: "flex flex-col gap-2",
-      },
-      style: {
-        "--border-radius": "calc(var(--radius)  + 4px)",
-      } as React.CSSProperties,
-    })
+  const onSubmit =async (values: z.infer<typeof loginFormSchema>) => {
+   try {
+     setLoading(true);
+
+     const {username, password} = values
+     await loginUser(username, password)
+     toast.success("Login successfully")
+     form.reset()
+     navigate({
+       to: "/profile"
+     })
+   }catch (error: any) {
+     toast.error(error?.message)
+   }finally{
+      setLoading(false);
+    }
   }
 
   return (
@@ -133,9 +141,13 @@ function LoginPage() {
                 {/*  login button*/}
                   <div className="flex">
                     <Button
+                      disabled={loading}
                       size="lg"
                       className="h-12 bg-primary w-full uppercase text-sm font-medium"
-                    >Login</Button>
+                    >
+                      {loading && <Spinner/>}
+                      Login
+                    </Button>
                   </div>
 
                 {/*  paragraph*/}

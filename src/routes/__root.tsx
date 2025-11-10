@@ -8,19 +8,19 @@ export const Route = createRootRoute({
   component: () => (
     <>
       <Outlet />
-      <Toaster />
+      <Toaster richColors />
       <MobileBottomNavBar/>
-      <TanStackDevtools
-        config={{
-          position: 'bottom-right',
-        }}
-        plugins={[
-          {
-            name: 'Tanstack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-        ]}
-      />
+      {/*<TanStackDevtools*/}
+      {/*  config={{*/}
+      {/*    position: 'bottom-right',*/}
+      {/*  }}*/}
+      {/*  plugins={[*/}
+      {/*    {*/}
+      {/*      name: 'Tanstack Router',*/}
+      {/*      render: <TanStackRouterDevtoolsPanel />,*/}
+      {/*    },*/}
+      {/*  ]}*/}
+      {/*/>*/}
     </>
   ),
 })
