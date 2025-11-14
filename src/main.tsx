@@ -11,11 +11,14 @@ import reportWebVitals from './reportWebVitals.ts'
 // @ts-ignore
 import '@fontsource-variable/inter';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import useAuthStore from "@/store/auth-store.ts";
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: {},
+  context: {
+    auth: undefined!
+  },
   defaultPreload: 'intent',
   scrollRestoration: true,
   defaultStructuralSharing: true,
@@ -32,6 +35,11 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const InnerApp = () => {
+  const auth = useAuthStore();
+  return  <RouterProvider router={router} context={{auth}}/>
+}
+
 // Render the app
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
@@ -39,7 +47,7 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router}/>
+       <InnerApp/>
       </QueryClientProvider>
     </StrictMode>,
   )

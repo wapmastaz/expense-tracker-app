@@ -1,7 +1,7 @@
 import apiClient from "@/services/apiClient.ts";
-import type {User} from "@/user.ts";
+import type {User} from "@/types/user.ts";
 
-interface RegisterNewUserResponse {
+interface AuthResponse {
   status: boolean;
   message: string;
   data: {
@@ -10,16 +10,11 @@ interface RegisterNewUserResponse {
   }
 }
 
-interface LoginResponse {
-  user: User
-  access_token: string;
-}
-
 export const registerNewUser =
-  async (username: string, email: string, password: string): Promise<RegisterNewUserResponse> => {
+  async (username: string, email: string, password: string): Promise<AuthResponse> => {
   try {
     const response =
-      await apiClient.post<RegisterNewUserResponse>('auth/register', {
+      await apiClient.post<AuthResponse>('auth/register', {
         username,
         email,
         password,
@@ -42,12 +37,13 @@ export const registerNewUser =
 }
 
 export const loginUser =
-  async (username: string, password: string): Promise<LoginResponse> => {
+  async (username: string, password: string): Promise<AuthResponse> => {
   try {
-    const response =await apiClient.post<LoginResponse>('auth/login', {
+    const response =await apiClient.post<AuthResponse>('auth/login', {
       username,
       password,
     })
+    console.log(response.data)
     return response.data
   } catch (error: any) {
 

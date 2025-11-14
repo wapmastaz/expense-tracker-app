@@ -1,13 +1,19 @@
-import {createFileRoute, Link} from '@tanstack/react-router'
+import {createFileRoute, Link, useNavigate} from '@tanstack/react-router'
 import {Button} from "@/components/ui/button.tsx";
 import {Bell, ChevronLeft, LogOutIcon} from "lucide-react";
 import {Image} from "@unpic/react";
 import {Item, ItemContent, ItemMedia, ItemTitle} from "@/components/ui/item.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
-import { Badge } from "@/components/ui/badge";
+import {Badge} from "@/components/ui/badge";
+import {useUserProfile} from "@/hooks/useUserProfile.ts";
+import {Spinner} from "@/components/ui/spinner.tsx";
+import {useState} from "react";
+import {logUserOut} from "@/services/user-service.ts";
+import {toast} from "sonner";
+import useAuthStore from "@/store/auth-store.ts";
 
-export const Route = createFileRoute('/profile')({
-  component: ProfilePage,
+export const Route = createFileRoute('/_authenticated/profile')({
+ component: ProfilePage,
 })
 
 interface ProfileMenuProps {
@@ -51,6 +57,30 @@ const profileMenu: ProfileMenuProps[] = [
 ]
 
 function ProfilePage() {
+
+  const {data: user, isLoading} = useUserProfile()
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const {clearToken} = useAuthStore((state) => state)
+  const navigate = useNavigate();
+
+  const logOut = async () => {
+    try {
+      setLoading(true)
+      const {message} = await logUserOut()
+      clearToken()
+      toast.success(message)
+      navigate({
+        to: "/login",
+        from: "/profile"
+      })
+    }catch (error) {
+      console.log(error)
+    }finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       <header
@@ -115,48 +145,55 @@ function ProfilePage() {
               className="h-full w-full mt-2"
             />
           </div>
-          {/*  name and username*/}
-          <div
-            className="flex flex-col
+
+          {isLoading ? (
+            <div className="flex justify-center">
+              <Spinner/>
+            </div>
+          ) : (
+            <div
+              className="flex flex-col
             gap-1
             items-center
             mb-6
             "
-          >
-            <h4
-              className="
+            >
+              <h4
+                className="
               font-semibold
               text-xl
               text-gray-800
               "
-            >
-              Enjelin Morgeana
-            </h4>
-            <p
-              className="font-semibold text-sm text-primary"
-            >
-              @enjelin_morgeana
-            </p>
-          </div>
+              >
+                {user?.username}
+              </h4>
+              <p
+                className="font-semibold text-sm text-primary"
+              >
+                {user?.email}
+              </p>
+            </div>
+          )}
+
 
           {/*  profile menu*/}
           <div className="flex mb-6 w-full max-w-lg flex-col">
             <Link to="/profile">
-            <Item variant="default">
-              <ItemMedia
-                className="rounded-full bg-[#F0F6F5] w-12.5 h-12.5 flex items-center justify-center">
-                <Image
-                  src="./profile-icons/diamond.png"
-                  width={33}
-                  height={27}
-                />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle className="text-base font-medium">
-                  Invite Friends
-                </ItemTitle>
-              </ItemContent>
-            </Item>
+              <Item variant="default">
+                <ItemMedia
+                  className="rounded-full bg-[#F0F6F5] w-12.5 h-12.5 flex items-center justify-center">
+                  <Image
+                    src="./profile-icons/diamond.png"
+                    width={33}
+                    height={27}
+                  />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle className="text-base font-medium">
+                    Invite Friends
+                  </ItemTitle>
+                </ItemContent>
+              </Item>
             </Link>
             <Separator/>
             {profileMenu.map(({id, name, icon, url}) => (
@@ -182,7 +219,10 @@ function ProfilePage() {
           </div>
 
           <div className="flex justify-center">
-            <Button className="flex gap-1" variant="destructive">
+            <Button disabled={loading}
+                    onClick={logOut}
+                    className="flex gap-1"
+                    variant="destructive">
               <LogOutIcon/>
               Logout
             </Button>

@@ -19,6 +19,7 @@ import {useState} from "react";
 import {registerNewUser} from "@/services/auth-service.ts";
 import {useMutation} from "@tanstack/react-query";
 import {Spinner} from "@/components/ui/spinner.tsx";
+import useAuthStore from "@/store/auth-store.ts";
 
 export const Route = createFileRoute('/register')({
   component: RegisterPage,
@@ -40,6 +41,7 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
+  const {setAccessToken} = useAuthStore()
 
   const form =
     useForm<z.infer<typeof registerFormSchema>>({
@@ -53,21 +55,23 @@ function RegisterPage() {
 
   const onSubmit =
     async (values: z.infer<typeof registerFormSchema>) => {
-    try {
-      setLoading(true)
-      const {username, email, password} = values
-      const {message} = await registerNewUser(username, email, password)
-      toast.success(message)
-      navigate({
-        to: "/profile"
-      })
-    }catch (e: any) {
-      toast.error(e?.message)
-    }finally {
-      setLoading(false)
-    }
+      try {
+        setLoading(true)
+        const {username, email, password} = values
+        const {message, data} = await registerNewUser(username, email, password)
+        toast.success(message)
+        const {access_token} = data
+        setAccessToken(access_token)
+        navigate({
+          to: "/profile"
+        })
+      } catch (e: any) {
+        toast.error(e?.message)
+      } finally {
+        setLoading(false)
+      }
 
-  }
+    }
 
   return (
     <>

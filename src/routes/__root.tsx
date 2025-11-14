@@ -1,26 +1,17 @@
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import {Outlet, createRootRouteWithContext} from '@tanstack/react-router'
 import {Toaster} from "sonner";
+import type {AuthContext} from "@/store/auth-store.ts";
 import MobileBottomNavBar from "@/components/layouts/MobileBottomNavBar.tsx";
 
-export const Route = createRootRoute({
+type RouterContext = {
+  auth: AuthContext;
+};
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <>
       <Outlet />
-      <Toaster richColors />
+      <Toaster richColors={true} position={"top-right"} />
       <MobileBottomNavBar/>
-      {/*<TanStackDevtools*/}
-      {/*  config={{*/}
-      {/*    position: 'bottom-right',*/}
-      {/*  }}*/}
-      {/*  plugins={[*/}
-      {/*    {*/}
-      {/*      name: 'Tanstack Router',*/}
-      {/*      render: <TanStackRouterDevtoolsPanel />,*/}
-      {/*    },*/}
-      {/*  ]}*/}
-      {/*/>*/}
     </>
   ),
 })

@@ -15,6 +15,7 @@ import {toast} from "sonner";
 import {loginUser} from "@/services/auth-service.ts";
 import {useState} from "react";
 import {Spinner} from "@/components/ui/spinner.tsx";
+import useAuthStore from "@/store/auth-store.ts";
 
 export const Route =
   createFileRoute('/login')({
@@ -33,6 +34,8 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
+  const {setAccessToken} = useAuthStore((state) => state)
+
   const [loading, setLoading] = useState(false);
 
   const form =
@@ -49,9 +52,11 @@ function LoginPage() {
      setLoading(true);
 
      const {username, password} = values
-     await loginUser(username, password)
+     const {data} = await loginUser(username, password)
      toast.success("Login successfully")
      form.reset()
+     const {access_token} = data
+     setAccessToken(access_token)
      navigate({
        to: "/profile"
      })
